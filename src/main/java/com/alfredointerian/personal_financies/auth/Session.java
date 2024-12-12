@@ -36,9 +36,17 @@ public class Session {
     public static Session getInstance (String email, String password) {
         if (instance == null) {
             instance = new Session(email, password);
+            
+            if (instance.getAccountId() == UNAUTHENTICATED) {
+                instance = null;
+            }
         }
         
         return instance;
+    }
+    
+    public void printSessionstatus () {
+        System.out.println("Active Account ID: " + this.accountId);
     }
     
     /**
@@ -47,6 +55,12 @@ public class Session {
      */
     public static Session getInstance () {
         return instance;
+    }
+    
+    public void logout() {
+        instance.accountId = UNAUTHENTICATED;
+        instance.bankingAccountSelected = UNAUTHENTICATED;
+        instance = null;
     }
 
     public int getAccountId() {
@@ -61,6 +75,10 @@ public class Session {
         this.bankingAccountSelected = bankingAccountId;
     }
     
+    /**
+     * Gets Account Email this inner SessionID
+     * @return String Account Email
+     */
     public String fetchAccountEmail () {
         try (Connection conn = connect();
              PreparedStatement verify = conn.prepareStatement("SELECT account_email FROM accounts WHERE account_id = ?")) {
@@ -100,7 +118,7 @@ public class Session {
             System.err.println(e.getMessage());
         }
 
-        return -1;
+        return UNAUTHENTICATED;
     }
 
 }
