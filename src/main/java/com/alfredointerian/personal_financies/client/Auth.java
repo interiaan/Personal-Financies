@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.alfredointerian.personal_financies.client;
+
 import com.alfredointerian.personal_financies.auth.Session;
 import javax.swing.JOptionPane;
 
@@ -52,6 +53,12 @@ public class Auth extends javax.swing.JFrame {
 
         jLabel2.setText("Password");
 
+        PassField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PassFieldActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -95,16 +102,33 @@ public class Auth extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void LoginBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LoginBtnMouseClicked
-        String email = EmailField.getText();
-        String password = PassField.getText();
-        
-        Session activeAccount = new Session(email, password);
-        
-        if (activeAccount.getAccount_id() == Session.UNAUTHENTICATED) {
-            JOptionPane.showMessageDialog(this, "Account couldn't be authenticated. Try again", null, JOptionPane.WARNING_MESSAGE);
-        } else {
+        try {
+            String email = EmailField.getText();
+            String password = PassField.getText();
+
+            if (email.isEmpty()) {
+                throw new Exception("Enter account email");
+            } else if (password.isEmpty()) {
+                throw new Exception("Enter password");
+            }
+            
+            Session session = Session.getInstance(email, password);
+
+            if (session.getInstance(email, password) == null) {
+                JOptionPane.showMessageDialog(this, "Account couldn't be authenticated. Try again", null, JOptionPane.WARNING_MESSAGE);
+            } else {
+                ControlPanel controlPanel = new ControlPanel();
+                controlPanel.setVisible(true);
+                this.dispose();
+            }            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), null, JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_LoginBtnMouseClicked
+
+    private void PassFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PassFieldActionPerformed
+        LoginBtnMouseClicked(null);
+    }//GEN-LAST:event_PassFieldActionPerformed
 
     /**
      * @param args the command line arguments
