@@ -5,10 +5,13 @@
 package com.alfredointerian.personal_financies.auth;
 
 import static com.alfredointerian.personal_financies.database.DatabaseManager.connect;
+import com.alfredointerian.personal_financies.database.BankingAccount;
+import com.alfredointerian.personal_financies.database.DatabaseManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Manages the session in current application execution
@@ -20,8 +23,17 @@ public class Session {
     
     private static Session instance = null;
     
+    // Global Session Memory
+
     int accountId = UNAUTHENTICATED;
     int bankingAccountSelected = UNAUTHENTICATED;
+    
+    ArrayList<BankingAccount> bankingAccountList = new ArrayList<>();
+
+    public ArrayList<BankingAccount> getBankingAccountList() {
+        return bankingAccountList;
+    }
+    
 
     private Session(String email, String password) {
         this.accountId = verifyCredentials(email, password);
@@ -45,10 +57,6 @@ public class Session {
         return instance;
     }
     
-    public void printSessionstatus () {
-        System.out.println("Active Account ID: " + this.accountId);
-    }
-    
     /**
      * Return session active, if there's no active session, a null value will be returned
      * @return 
@@ -57,6 +65,16 @@ public class Session {
         return instance;
     }
     
+    /**
+     * Set local banking account list with database information
+     */
+    public void setBankingAccountList (ArrayList<BankingAccount> list) {
+        this.bankingAccountList = list;
+    }
+    
+    /**
+     * Establish all current session data to default values and close the session instance
+     */
     public void logout() {
         instance.accountId = UNAUTHENTICATED;
         instance.bankingAccountSelected = UNAUTHENTICATED;
