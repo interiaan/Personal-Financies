@@ -16,14 +16,66 @@ import java.sql.SQLException;
  */
 public class Session {
 
-    int account_id = -1;
+    public static final int UNAUTHENTICATED = -1;
+    
+    private static Session instance = null;
+    
+    int accountId = UNAUTHENTICATED;
+    int bankingAccountSelected = UNAUTHENTICATED;
 
-    public Session(String email, String password) {
-        this.account_id = verifyCredentials(email, password);
+    private Session(String email, String password) {
+        this.accountId = verifyCredentials(email, password);
+    }
+    
+    /**
+     * Creates a session instance
+     * @param email
+     * @param password
+     * @return Session Instance (Reusable)
+     */
+    public static Session getInstance (String email, String password) {
+        if (instance == null) {
+            instance = new Session(email, password);
+        }
+        
+        return instance;
+    }
+    
+    /**
+     * Return session active, if there's no active session, a null value will be returned
+     * @return 
+     */
+    public static Session getInstance () {
+        return instance;
     }
 
-    public int getAccount_id() {
-        return account_id;
+    public int getAccountId() {
+        return accountId;
+    }
+
+    public int getBankingAccountSelected() {
+        return bankingAccountSelected;
+    }
+    
+    public void setBankingAccountSelected (int bankingAccountId) {
+        this.bankingAccountSelected = bankingAccountId;
+    }
+    
+    public String fetchAccountEmail () {
+        try (Connection conn = connect();
+             PreparedStatement verify = conn.prepareStatement("SELECT account_email FROM accounts WHERE account_id = ?")) {
+            verify.setInt(1, this.accountId);
+
+            ResultSet account = verify.executeQuery();
+
+            if (account.next()) {
+                return account.getString("account_email");
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        
+        return "[Email not found]";
     }
 
     /**
