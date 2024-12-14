@@ -37,11 +37,21 @@ public class BankingAccount {
      * Add the stored banking account data to database
      */
     public void addBankingAccountToDatabase () {
-        try (Connection conn = DatabaseManager.connect(); PreparedStatement add = conn.prepareStatement("INSERT INTO banking_accounts (bk_acc_name, bk_acc_owner) VALUES (?, ?)")) {
+        try (Connection conn = connect(); PreparedStatement add = conn.prepareStatement("INSERT INTO banking_accounts (bk_acc_name, bk_acc_owner) VALUES (?, ?)")) {
             add.setString(1, this.bankingAccountName);
             add.setInt(2, this.bankingAccountOwner);
             add.execute();
         } catch (SQLException e) {
+            System.err.println(e);
+        }
+    }
+    
+    public void deleteBankingAccountInDatabase () {
+        try (Connection conn = connect(); PreparedStatement delete = conn.prepareStatement("DELETE FROM banking_accounts WHERE bk_acc_id = ?")) {
+            delete.setInt(1, this.bankingAccountId);
+            
+            delete.execute();
+        } catch (Exception e) {
             System.err.println(e);
         }
     }
