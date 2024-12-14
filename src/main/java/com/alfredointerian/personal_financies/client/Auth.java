@@ -112,9 +112,9 @@ public class Auth extends javax.swing.JFrame {
                 throw new Exception("Enter password");
             }
             
-            Session session = Session.getInstance(email, password);
-
-            if (session.getInstance(email, password) == null) {
+            Session instance = Session.getInstance(email, password);         
+            
+            if (instance == null) {
                 JOptionPane.showMessageDialog(this, "Account couldn't be authenticated. Try again", null, JOptionPane.WARNING_MESSAGE);
             } else {
                 ControlPanel controlPanel = new ControlPanel();
@@ -122,7 +122,7 @@ public class Auth extends javax.swing.JFrame {
                 this.dispose();
             }            
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), null, JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, e, null, JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_LoginBtnMouseClicked
 
