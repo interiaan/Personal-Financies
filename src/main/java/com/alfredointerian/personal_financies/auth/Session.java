@@ -6,7 +6,6 @@ package com.alfredointerian.personal_financies.auth;
 
 import static com.alfredointerian.personal_financies.database.DatabaseManager.connect;
 import com.alfredointerian.personal_financies.database.BankingAccount;
-import com.alfredointerian.personal_financies.database.DatabaseManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,7 +27,7 @@ public class Session {
     int accountId = UNAUTHENTICATED;
     int bankingAccountSelected = UNAUTHENTICATED;
     
-    ArrayList<BankingAccount> bankingAccountList = new ArrayList<>();
+    private ArrayList<BankingAccount> bankingAccountList = new ArrayList<>();
 
     public ArrayList<BankingAccount> getBankingAccountList() {
         return bankingAccountList;
@@ -37,6 +36,10 @@ public class Session {
 
     private Session(String email, String password) {
         this.accountId = verifyCredentials(email, password);
+    }
+    
+    public boolean isActive () {
+        return ((instance != null));
     }
     
     /**
@@ -49,8 +52,11 @@ public class Session {
         if (instance == null) {
             instance = new Session(email, password);
             
+            System.out.println("Iniciando sesión..");
+            
             if (instance.getAccountId() == UNAUTHENTICATED) {
                 instance = null;
+                System.out.println("Credenciales incorrectas");
             }
         }
         
@@ -67,18 +73,17 @@ public class Session {
     
     /**
      * Set local banking account list with database information
+     * @param list
      */
     public void setBankingAccountList (ArrayList<BankingAccount> list) {
-        this.bankingAccountList = list;
+        instance.bankingAccountList = list;
     }
     
     /**
-     * Establish all current session data to default values and close the session instance
+     * Establish close the session instance, erasing data
      */
     public void logout() {
-        instance.accountId = UNAUTHENTICATED;
-        instance.bankingAccountSelected = UNAUTHENTICATED;
-        instance = null;
+        Session.instance = null;
     }
 
     public int getAccountId() {
@@ -111,7 +116,7 @@ public class Session {
             System.err.println(e.getMessage());
         }
         
-        return "[Email not found]";
+        return "[Email not found with AccountID " + this.accountId + "]";
     }
 
     /**
