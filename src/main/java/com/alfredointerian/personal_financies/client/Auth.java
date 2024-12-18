@@ -104,7 +104,7 @@ public class Auth extends javax.swing.JFrame {
     private void LoginBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LoginBtnMouseClicked
         try {
             String email = EmailField.getText();
-            String password = PassField.getText();
+            String password = String.valueOf(PassField.getPassword());
 
             if (email.isEmpty()) {
                 throw new Exception("Enter account email");
