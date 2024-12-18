@@ -56,6 +56,48 @@ public class BankingAccount {
         }
     }
     
+    public ArrayList<Movement> fetchLatestMovements () {
+        try (Connection conn = connect();
+                PreparedStatement latestMovementsStmt = conn.prepareStatement("SELECT * FROM movements WHERE bk_acc_id = ? ORDER BY movement_date, movement_time DESC")) {
+            latestMovementsStmt.setInt(1, this.bankingAccountId);
+            ResultSet latestMovements = latestMovementsStmt.executeQuery();
+            
+            ArrayList<Movement> movements = new ArrayList<>();
+            while (latestMovements.next()) {                
+                movements.add(new Movement(latestMovements.getString("movement_concept"), latestMovements.getString("movement_description"), latestMovements.getDouble("movement_amount"), latestMovements.getString("movement_date"), latestMovements.getString("movement_time"), latestMovements.getInt("bk_acc_id")));
+            }
+            
+            return movements;
+
+        } catch (SQLException e) {
+            System.err.println(e);
+        }
+        
+        return new ArrayList<>();
+    }
+    
+    /**
+     * Gets related banking account movements
+     * @return Double Total 
+     */
+    public double fetchTotalBalance () {
+        try (Connection conn = connect();
+            PreparedStatement totalBalanceStmt = conn.prepareStatement("SELECT SUM(movement_amount) as total FROM movements WHERE bk_acc_id = ?;")) {
+            totalBalanceStmt.setInt(1, this.getAccountId());
+
+            ResultSet totalBalance = totalBalanceStmt.executeQuery();
+
+            if (totalBalance.next()) {
+                return totalBalance.getDouble("total");
+            }        
+            
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        
+        return 0;
+    }
+    
     public String fetchBankingAccountName () {
         try (Connection conn = connect();
              PreparedStatement verify = conn.prepareStatement("SELECT bk_acc_name FROM banking_accounts WHERE bk_acc_id = ?")) {
