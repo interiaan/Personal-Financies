@@ -26,20 +26,12 @@ public class Session {
 
     int accountId = UNAUTHENTICATED;
     int bankingAccountSelected = UNAUTHENTICATED;
+    double totalBalanceSelected = UNAUTHENTICATED;
     
     private ArrayList<BankingAccount> bankingAccountList = new ArrayList<>();
 
-    public ArrayList<BankingAccount> getBankingAccountList() {
-        return bankingAccountList;
-    }
-    
-
     private Session(String email, String password) {
         this.accountId = verifyCredentials(email, password);
-    }
-    
-    public boolean isActive () {
-        return ((instance != null));
     }
     
     /**
@@ -70,21 +62,6 @@ public class Session {
     public static Session getInstance () {
         return instance;
     }
-    
-    /**
-     * Set local banking account list with database information
-     * @param list
-     */
-    public void setBankingAccountList (ArrayList<BankingAccount> list) {
-        instance.bankingAccountList = list;
-    }
-    
-    /**
-     * Establish close the session instance, erasing data
-     */
-    public void logout() {
-        Session.instance = null;
-    }
 
     public int getAccountId() {
         return accountId;
@@ -94,9 +71,39 @@ public class Session {
         return bankingAccountSelected;
     }
     
-    public void setBankingAccountSelected (int bankingAccountId) {
-        this.bankingAccountSelected = bankingAccountId;
+    public double getTotalBalance () {
+        return totalBalanceSelected;
     }
+    
+    public ArrayList<BankingAccount> getBankingAccountList() {
+        return bankingAccountList;
+    }
+    
+    public void setTotalBalance (int bankingAccountSelected) {
+        if (instance.getBankingAccountSelected() == -1) {
+            totalBalanceSelected = 0.0;
+        } else {
+            totalBalanceSelected = getBankingAccountList().get(bankingAccountSelected).fetchTotalBalance();
+        }
+    }
+    
+    public boolean isActive () {
+        return ((instance != null));
+    }
+    
+    public void setBankingAccountSelected (int bankingAccountId) {   
+        this.bankingAccountSelected = instance.bankingAccountList.get(bankingAccountId).getAccountId();
+    }
+    
+    /**
+     * Set local banking account list with database information
+     * @param list
+     */
+    public void setBankingAccountList (ArrayList<BankingAccount> list) {
+        instance.bankingAccountList = list;
+    }
+    
+    // <editor-fold desc="Database Actions">
     
     /**
      * Gets Account Email this inner SessionID
@@ -117,6 +124,23 @@ public class Session {
         }
         
         return "[Email not found with AccountID " + this.accountId + "]";
+    }
+    
+    public String fetchBankingAccountName () {
+        try (Connection conn = connect();
+             PreparedStatement verify = conn.prepareStatement("SELECT bk_acc_name FROM banking_accounts WHERE bk_acc_id = ?")) {
+            verify.setInt(1, this.getBankingAccountSelected());
+
+            ResultSet account = verify.executeQuery();
+
+            if (account.next()) {
+                return account.getString("bk_acc_name");
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        
+        return "[Banking Account name not found with AccountID " + this.getBankingAccountSelected() + "]";
     }
 
     /**
@@ -143,5 +167,13 @@ public class Session {
 
         return UNAUTHENTICATED;
     }
+    
+    // </editor-fold>
 
+    /**
+     * Establish close the session instance, erasing data
+     */
+    public void logout() {
+        Session.instance = null;
+    }
 }
