@@ -7,13 +7,9 @@ package com.alfredointerian.personal_financies.client;
 import com.alfredointerian.personal_financies.auth.Session;
 import com.alfredointerian.personal_financies.database.BankingAccount;
 import com.alfredointerian.personal_financies.database.Movement;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.util.ArrayList;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 /**
@@ -42,15 +38,17 @@ public class ControlPanel extends javax.swing.JFrame {
     }
     
     private void setLatestMovements () {
+        session.setMovementList(session.getBankingAccountList().get(BankingAccountsList.getSelectedIndex()).fetchLatestMovements());  
+        
         LatestMovementsScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); 
         LatestMovementsScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         
         LatestMovements.removeAll();
         
-        for (Movement movement : session.getBankingAccountList().get(BankingAccountsList.getSelectedIndex()).fetchLatestMovements()) {
-            LatestMovements.add(new MovementPanel(movement.getMovementConcept(), movement.getMovementDate(), movement.getMovementTime(), String.valueOf(movement.getMovementAmount())));
-            
-            System.out.println("Actualizando Lista de cuentas bancarias... " + movement.getMovementConcept());
+        int movementIndex = 0;
+        for (Movement movement : session.getMovementList()) {
+            LatestMovements.add(new MovementPanel(movementIndex, movement.getMovementConcept(), movement.getMovementDate(), movement.getMovementTime(), String.valueOf(movement.getMovementAmount())));
+            movementIndex++;
         }
         
         int height = 1000;
