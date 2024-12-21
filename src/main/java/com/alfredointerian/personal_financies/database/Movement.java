@@ -28,6 +28,10 @@ public class Movement {
         this.movementTime = movementTime;
         this.bk_acc_id = bk_acc_id;
     }
+    
+    public int getMovementId () {
+        return movementId;
+    }
 
     public String getMovementConcept() {
         return movementConcept;
@@ -45,7 +49,9 @@ public class Movement {
         return movementTime;
     }
     
-    
+    public String getMovementDescription () {
+        return movementDescription;
+    }
     
     public void setMovementId (int movementId) {
         this.movementId = movementId;
