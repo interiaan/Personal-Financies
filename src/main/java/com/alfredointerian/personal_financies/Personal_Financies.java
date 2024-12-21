@@ -3,13 +3,8 @@
  */
 package com.alfredointerian.personal_financies;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import static com.alfredointerian.personal_financies.database.DatabaseManager.connect;
-import java.sql.ResultSet;
-
 import com.alfredointerian.personal_financies.client.Auth;
+import javax.swing.UIManager;
 
 /**
  *
@@ -18,19 +13,16 @@ import com.alfredointerian.personal_financies.client.Auth;
 public class Personal_Financies {
 
     public static void main(String[] args) {
+        
+        // <editor-fold defaultstate="collapsed" desc="Look and Feel">
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        } catch (Exception e) {
+            System.err.println("Look and Feel couldn't be applied. " + e);
+        }
+        // </editor-fold>
+        
         Auth auth = new Auth();
         auth.setVisible(true);
-    }
-    
-    private static void viewBankingAccounts () {
-        try (Connection conn = connect(); PreparedStatement bankingAccounts = conn.prepareStatement("SELECT * FROM banking_accounts")) {
-            ResultSet rs = bankingAccounts.executeQuery();
-            
-            while (rs.next()) {
-                System.out.println( rs.getString("bk_acc_name"));
-            }
-        } catch (SQLException e) {
-            System.err.println(e);
-        }
     }
 }
