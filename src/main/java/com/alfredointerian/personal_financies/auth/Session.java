@@ -6,6 +6,7 @@ package com.alfredointerian.personal_financies.auth;
 
 import static com.alfredointerian.personal_financies.database.DatabaseManager.connect;
 import com.alfredointerian.personal_financies.database.BankingAccount;
+import com.alfredointerian.personal_financies.database.Movement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,7 +29,9 @@ public class Session {
     int bankingAccountSelected = UNAUTHENTICATED;
     double totalBalanceSelected = UNAUTHENTICATED;
     
-    private ArrayList<BankingAccount> bankingAccountList = new ArrayList<>();
+    private ArrayList<BankingAccount> bankingAccountList = new ArrayList<>();    
+    private ArrayList<Movement> movementList = new ArrayList<>();
+
 
     private Session(String email, String password) {
         this.accountId = verifyCredentials(email, password);
@@ -42,13 +45,9 @@ public class Session {
      */
     public static Session getInstance (String email, String password) {
         if (instance == null) {
-            instance = new Session(email, password);
-            
-            System.out.println("Iniciando sesión..");
-            
+            instance = new Session(email, password);            
             if (instance.getAccountId() == UNAUTHENTICATED) {
                 instance = null;
-                System.out.println("Credenciales incorrectas");
             }
         }
         
@@ -77,6 +76,14 @@ public class Session {
     
     public ArrayList<BankingAccount> getBankingAccountList() {
         return bankingAccountList;
+    }
+
+    public ArrayList<Movement> getMovementList() {
+        return movementList;
+    }
+
+    public void setMovementList(ArrayList<Movement> movementList) {
+        this.movementList = movementList;
     }
     
     public void setTotalBalance (int bankingAccountSelected) {
