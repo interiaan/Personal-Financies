@@ -6,9 +6,16 @@ package com.alfredointerian.personal_financies.client;
 
 import com.alfredointerian.personal_financies.auth.Session;
 import com.alfredointerian.personal_financies.database.Movement;
+import java.text.DecimalFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import javax.swing.JOptionPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 /**
  *
@@ -32,6 +39,16 @@ public class NewMovement extends javax.swing.JFrame {
         DateChooserPanel.add(dateChooser);
         DateChooserPanel.revalidate();
         DateChooserPanel.repaint();
+    }
+    private void setAmountStatus () {        
+        String amountText = AmountField.getText();
+        if (!amountText.isEmpty()) {
+            double amount = Double.parseDouble(amountText);
+            DecimalFormat formatter = new DecimalFormat("#,###.00");
+            String formattedAmount = formatter.format(amount);
+        
+            AmountStatus.setText("<html><span style='color:" + (AmountType.isSelected() ? "red" : "green") + ";'>(" + (AmountType.isSelected() ? "-" : "+") + formattedAmount + ")</span></html>");         
+        } 
     }
 
     /**
@@ -58,6 +75,9 @@ public class NewMovement extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         DateChooserPanel = new javax.swing.JPanel();
         DefaultTimeChkBox = new javax.swing.JCheckBox();
+        AmountType = new javax.swing.JCheckBox();
+        jLabel6 = new javax.swing.JLabel();
+        AmountStatus = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -66,9 +86,13 @@ public class NewMovement extends javax.swing.JFrame {
 
         jLabel2.setText("Concept");
 
+        AmountField.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
+        AmountField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+
         jLabel3.setText("Description");
 
         DescriptionTextArea.setColumns(20);
+        DescriptionTextArea.setLineWrap(true);
         DescriptionTextArea.setRows(5);
         DescriptionScroll.setViewportView(DescriptionTextArea);
 
@@ -100,6 +124,21 @@ public class NewMovement extends javax.swing.JFrame {
             }
         });
 
+        AmountType.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
+        AmountType.setSelected(true);
+        AmountType.setText("Expense");
+        AmountType.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                AmountTypeItemStateChanged(evt);
+            }
+        });
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 28)); // NOI18N
+        jLabel6.setText("$");
+
+        AmountStatus.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        AmountStatus.setText("<AmountStatus>");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -110,20 +149,32 @@ public class NewMovement extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(26, 26, 26)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(ReturnBtn)
-                                    .addGap(89, 89, 89)
-                                    .addComponent(AddMovementBtn))
-                                .addComponent(AmountField, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(DescriptionScroll, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(ConceptField, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(DateChooserPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(DefaultTimeChkBox)))
+                            .addComponent(DescriptionScroll)
+                            .addComponent(ConceptField)
+                            .addComponent(DateChooserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel6)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(AmountField))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(ReturnBtn)
+                                        .addGap(89, 89, 89)
+                                        .addComponent(AddMovementBtn))
+                                    .addComponent(DefaultTimeChkBox, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(AmountType, javax.swing.GroupLayout.Alignment.TRAILING)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel5))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(AmountStatus))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(15, 15, 15)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -131,7 +182,7 @@ public class NewMovement extends javax.swing.JFrame {
                                 .addGap(6, 6, 6)
                                 .addComponent(SelectedBankingAccountLabel))
                             .addComponent(jLabel1))))
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addGap(29, 29, 29))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -151,21 +202,67 @@ public class NewMovement extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(DescriptionScroll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel4)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(AmountStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(2, 2, 2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(AmountField, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(AmountField, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addComponent(AmountType)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(DateChooserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(DefaultTimeChkBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(AddMovementBtn)
                     .addComponent(ReturnBtn))
                 .addGap(21, 21, 21))
         );
+
+        // <editor-fold desc="Document Listener | Amount Status" defaultstate="collapsed">
+        AmountField.getDocument().addDocumentListener(new DocumentListener () {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                setAmountStatus();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                setAmountStatus();
+
+                if (AmountField.getText().isBlank()) {
+                    AmountStatus.setText("");
+                }
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {}
+        });
+        // </editor-fold>
+
+        // <editor-fold desc="Document Filter | Allow only numbers" defaultstate="collapsed">
+        ((AbstractDocument) AmountField.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                if (string.matches("\\d*")) { // Solo permitir dígitos
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                if (text.matches("\\d*")) { // Solo permitir dígitos
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+        });
+        // </editor-fold>
+        AmountStatus.setText("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -203,6 +300,10 @@ public class NewMovement extends javax.swing.JFrame {
         
         Double movementAmount = Double.valueOf(movementAmountText);
         
+        if (AmountType.isSelected()) {
+            movementAmount *= -1;
+        }
+        
         // Verify what time we should use
         
         if (!DefaultTimeChkBox.isSelected()) {
@@ -239,6 +340,18 @@ public class NewMovement extends javax.swing.JFrame {
             System.out.println("Establecer hora del equipo");
         }
     }//GEN-LAST:event_DefaultTimeChkBoxItemStateChanged
+
+    private void AmountTypeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_AmountTypeItemStateChanged
+        if (AmountType.isSelected()) {
+            // Amount type is an expense
+            AmountType.setText("Expense");
+            setAmountStatus();
+        } else {
+            // Amount type is an income
+            AmountType.setText("Income");
+            setAmountStatus();
+        }
+    }//GEN-LAST:event_AmountTypeItemStateChanged
 
     /**
      * @param args the command line arguments
@@ -278,6 +391,8 @@ public class NewMovement extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AddMovementBtn;
     private javax.swing.JTextField AmountField;
+    private javax.swing.JLabel AmountStatus;
+    private javax.swing.JCheckBox AmountType;
     private javax.swing.JTextField ConceptField;
     private javax.swing.JPanel DateChooserPanel;
     private javax.swing.JCheckBox DefaultTimeChkBox;
@@ -290,6 +405,7 @@ public class NewMovement extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JSeparator jSeparator1;
     // End of variables declaration//GEN-END:variables
 }
